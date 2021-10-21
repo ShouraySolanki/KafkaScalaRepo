@@ -8,7 +8,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 
 import java.util.Properties
 
-class KafkaUtils{
+object KafkaUtils{
   def getProducer: Producer[_,_] = {
     val properties = new Properties
     properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")

@@ -1,23 +1,25 @@
 package com.kafka.example
 
-import scala.collection
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.kafka.clients.consumer.ConsumerRecords
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.apache.kafka.clients.consumer.KafkaConsumer
+
+import java.io.ByteArrayOutputStream
 import java.time.Duration
 import java.util
 
 class DataTransformer{
-  val objectMapper = new ObjectMapper
+
 
   val producerExample = new ProducerExample
 
   val consumerExample = new ConsumerExample
   val kafkaConsumer: KafkaConsumer[String,String] = consumerExample.consumeMethod
 
-  def getSendTransform(): String = {
+
+  def getSendTransform(): Unit = {
 
     kafkaConsumer.subscribe(util.Arrays.asList("jsontest"))
     kafkaConsumer.poll(0)
@@ -26,10 +28,35 @@ class DataTransformer{
     while (true){
       val records = kafkaConsumer.poll(Duration.ZERO)
 
-      for ( rec <- records){
+      records.forEach{ rec =>
+        try {
 
-        val message= rec.v
+          val objectMapper = new ObjectMapper() with ScalaObjectMapper
+          objectMapper.registerModule(DefaultScalaModule)
+          val message = rec.value()
+
+          val sum: Sum = objectMapper.readValue[Sum](message)
+          println(sum.getA())
+          println(sum.getB())
+
+          val out = new ByteArrayOutputStream()
+
+
+          sum.setSum(sum.getA() + sum.getB())
+          objectMapper.writeValue(out, sum)
+
+          val json = out.toString
+
+          producerExample.produceMethod("jsontest1", json)
+          //println(json)
+        }
+        catch{
+          case e:JsonProcessingException => throw e
+        }
+
+
       }
+
 
     }
 
