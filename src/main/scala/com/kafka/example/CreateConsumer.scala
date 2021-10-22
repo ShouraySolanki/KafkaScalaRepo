@@ -8,8 +8,8 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.util.Properties
 
 
-class ConsumerExample {
-  def consumeMethod: KafkaConsumer[String, String] = {
+class CreateConsumer {
+  def consume: KafkaConsumer[String, String] = {
     val config = new Properties
     config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
     config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, new StringDeserializer().getClass.getName)

@@ -1,10 +1,10 @@
 
-import com.kafka.example.DataTransformer
+import com.kafka.example.Processor
 
 
 object AppRunner {
   def main(args: Array[String]): Unit = {
-    val dataTransformer = new DataTransformer
-    System.out.println(dataTransformer.getSendTransform)
+    val dataTransformer = new Processor
+    System.out.println(dataTransformer.process())
   }
 }

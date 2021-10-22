@@ -7,7 +7,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 import java.util.Properties
 
 
-class ProducerExample {
+class ProducerSend {
   val properties = new Properties
   properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
   properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer].getName)
@@ -15,7 +15,7 @@ class ProducerExample {
   val producer = new KafkaProducer[String, String](properties)
 
 
-  def produceMethod(topic: String, message: String): Unit = {
+  def produce(topic: String, message: String): Unit = {
     producer.send(new ProducerRecord[String, String](topic, message))
   }
 }
