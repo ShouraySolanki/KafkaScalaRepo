@@ -6,25 +6,16 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.apache.kafka.clients.consumer.KafkaConsumer
 
-import java.io.ByteArrayOutputStream
 import java.time.Duration
 import java.util
-class Processor{
 
-
-  val producerExample = new ProducerSend
+class DatabaseConsumer {
 
   val consumerExample = new CreateConsumer
-  val kafkaConsumer: KafkaConsumer[String,String] = consumerExample.consume
+  val kafkaConsumer: KafkaConsumer[String,String] = consumerExample.consumetodatabase
+  def consumeSend(): Unit ={
+    kafkaConsumer.subscribe(util.Arrays.asList("jsontest1"))
 
-
-
-
-  def process(): Unit = {
-
-    kafkaConsumer.subscribe(util.Arrays.asList("jsontest"))
-    kafkaConsumer.poll(0)
-    kafkaConsumer.seekToBeginning(kafkaConsumer.assignment())
 
     while (true){
       val records = kafkaConsumer.poll(Duration.ZERO)
@@ -37,20 +28,11 @@ class Processor{
           val message = rec.value()
 
           val sum: Sum = objectMapper.readValue[Sum](message)
-          println(sum.getA())
-          println(sum.getB())
+//          println(sum.getA())
+//          println(sum.getB())
+          val avg = (sum.getA()+sum.getB()+sum.getSum())/3
 
-          val out = new ByteArrayOutputStream()
-
-
-          sum.setSum(sum.getA() + sum.getB())
-          objectMapper.writeValue(out, sum)
-
-          val json = out.toString
-
-          producerExample.produce("jsontest1", json)
-//          val avg = (sum.getA()+sum.getB()+sum.getSum())/3
-//          ConnectDb.sendData(sum.getA(),sum.getB(),sum.getSum(), avg)
+          ConnectDb.sendData(sum.getA(), sum.getB(), sum.getSum(),avg )
         }
         catch{
           case e:JsonProcessingException => throw e
@@ -62,6 +44,6 @@ class Processor{
 
     }
 
-
   }
-}
+  }
+

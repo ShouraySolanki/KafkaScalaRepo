@@ -16,6 +16,7 @@ class ProducerSend {
 
 
   def produce(topic: String, message: String): Unit = {
+
     producer.send(new ProducerRecord[String, String](topic, message))
   }
 }
